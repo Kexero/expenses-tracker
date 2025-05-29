@@ -1,0 +1,16 @@
+# PyCharm IDE
+.idea/
+
+# Виртуальное окружение
+venv/
+env/
+
+# Секреты
+.env
+
+# Python мусор
+__pycache__/
+*.py[cod]
+
+# Alembic
+alembic.ini
