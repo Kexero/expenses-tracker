@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 from model.user_model import Users
-from schema.user_schemas import UserGet
+from schema.user_schemas import UserGet, UserEmailUpdate
 from typing import List, Optional
 
 
@@ -26,7 +27,19 @@ def get_all_users(db: Session) -> List[Users]:
     return db.query(Users).all()
 
 
-def update_user(db: Session, user_id: int, user_data: UserGet) -> Optional[Users]:
+def get_user_by_name(db: Session, first_name: str, last_name: str) -> List[Users]:
+    return db.query(Users).filter(or_(Users.first_name == first_name, Users.last_name == last_name)).all()
+
+
+def get_user_by_gender(db: Session, gender: str) -> List[Users]:
+    return db.query(Users).filter(Users.gender == gender).all()
+
+
+def get_user_by_email(db: Session, email: str) -> Optional[Users]:
+    return db.query(Users).filter(Users.email == email).first()
+
+
+def update_user_admin(db: Session, user_id: int, user_data: UserGet) -> Optional[Users]:
     user = db.query(Users).filter(Users.user_id == user_id).first()
     if user:
         user.first_name = user_data.first_name
@@ -40,6 +53,23 @@ def update_user(db: Session, user_id: int, user_data: UserGet) -> Optional[Users
     return None
 
 
+def update_user(db: Session, db_user: Users, user_data: UserGet) -> Users:
+    db_user.first_name = user_data.first_name
+    db_user.last_name = user_data.last_name
+    db_user.gender = user_data.gender
+    db_user.password = user_data.password
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+
+def change_email(db: Session, db_user: Users, new_email: str) -> Users:
+    db_user.email = new_email
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+
 def delete_user(db: Session, user_id: int) -> bool:
     user = db.query(Users).filter(Users.user_id == user_id).first()
     if user:
@@ -47,7 +77,3 @@ def delete_user(db: Session, user_id: int) -> bool:
         db.commit()
         return True
     return False
-
-
-def get_user_by_email(db: Session, email: str) -> Optional[Users]:
-    return db.query(Users).filter(Users.email == email).first()

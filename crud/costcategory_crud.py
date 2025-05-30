@@ -28,8 +28,8 @@ def get_cost_category_by_description(db: Session, cost_category_description: str
     return db.query(CostCategory).filter(CostCategory.description.ilike(f"%{cost_category_description}%")).all()
 
 
-def get_cost_category_by_name(db: Session, cost_category_name: str) -> List[CostCategory]:
-    return db.query(CostCategory).filter(CostCategory.name == cost_category_name).all()
+def get_cost_category_by_name(db: Session, cost_category_name: str) -> Optional[CostCategory]:
+    return db.query(CostCategory).filter(CostCategory.name == cost_category_name).first()
 
 
 def update_cost_categories(db: Session, cost_category_id: int, user_data: CostCategoryGet) -> Optional[CostCategory]:

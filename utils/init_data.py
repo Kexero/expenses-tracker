@@ -17,3 +17,11 @@ def create_default_categories():
             db.add(new_cat)
     db.commit()
     db.close()
+
+
+def validate_password(value: str) -> str:
+    if not any(char.isdigit() for char in value):
+        raise ValueError("Пароль должен содержать хотя бы одну цифру")
+    if not any(char.isupper() for char in value):
+        raise ValueError("Пароль должен содержать хотя бы одну заглавную букву")
+    return value

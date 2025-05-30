@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field, EmailStr, field_validator
 from typing import Optional
+from utils.init_data import validate_password
 
 
 class UserBase(BaseModel):
@@ -13,14 +14,29 @@ class UserGet(UserBase):
     password: str = Field(min_length=7)
 
     @field_validator("password")
-    def validate_password(cls, value):
-        if not any(char.isdigit() for char in value):
-            raise ValueError("Пароль должен содержать хотя бы одну цифру")
-        if not any(char.isupper() for char in value):
-            raise ValueError("Пароль должен содержать хотя бы одну заглавную букву")
-        return value
+    def validate(cls, value):
+        return validate_password(value)
 
 
 class UserOut(UserBase):
+    class Config:
+        orm_mode = True
+
+
+class UserEmailUpdate(BaseModel):
+    email: EmailStr
+    class Config:
+        orm_mode = True
+
+
+class UserUpdateData(BaseModel):
+    first_name: str = Field(min_length=3)
+    last_name: str = Field(min_length=3)
+    gender: Optional[str] = None
+    password: str = Field(min_length=7)
+
+    @field_validator("password")
+    def validate(cls, value):
+        return validate_password(value)
     class Config:
         orm_mode = True
