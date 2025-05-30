@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from database import get_db
 from crud import user_crud
 from schema.user_schemas import UserGet, UserOut
 from typing import List
+from template import templates
 
 
 user_router = APIRouter(prefix="/user", tags=["Пользователи"])
@@ -15,6 +16,11 @@ def create_user(user: UserGet, db: Session = Depends(get_db)):
     if db_user:
         raise HTTPException(status_code=400, detail="Пользователь с таким email уже существует")
     return user_crud.create_user(db, user)
+
+
+@user_router.get("/register")
+def show_register_form(request: Request):
+    return templates.TemplateResponse("register.html", {"request": request})
 
 
 @user_router.get("/", response_model=List[UserOut])
